@@ -5,7 +5,7 @@ resource "google_compute_instance" "control_center" {
   tags = ["confluent"]
   project = var.project
   zone = var.zone
-labels = {
+  labels = {
     "stack":"confluent",
     "ansible_group":"control_center"
   }
@@ -18,7 +18,7 @@ labels = {
 
 
   network_interface {
-    network = "default"
+    network = var.network
 
     access_config {
       // Ephemeral IP

@@ -41,6 +41,7 @@ import os
 import re
 import traceback
 from subprocess import Popen, PIPE
+import yaml
 
 TERRAFORM_PATH = os.environ.get('ANSIBLE_TF_BIN', 'terraform')
 TERRAFORM_DIR = os.environ.get('ANSIBLE_TF_DIR', os.getcwd())
@@ -211,13 +212,14 @@ class AnsibleInventory(object):
 
     def add_group_resource(self, resource):
         '''Upsert type action for group resources.'''
-        groupname = resource.read_dict_attr("labels")['ansible_group']
-        if groupname in self.groups:
-            group = self.groups[groupname]
-            group.add_source(resource)
-        else:
-            group = AnsibleGroup(groupname, source=resource)
-            self.groups[groupname] = group
+        groupname = resource.read_dict_attr("labels").get('ansible_group',None)
+        if groupname:
+            if groupname in self.groups:
+                group = self.groups[groupname]
+                group.add_source(resource)
+            else:
+                group = AnsibleGroup(groupname, source=resource)
+                self.groups[groupname] = group
 
     def update_groups(self, groupname, children=None, hosts=None, group_vars=None):
         '''Upsert type action for group resources'''
@@ -317,7 +319,7 @@ class AnsibleGroup(object):
     def __init__(self, groupname, source=None):
         self.groupname = groupname
         self.sources = []
-        self.hosts = set()
+        self.hosts = {}
         self.children = set()
         self.group_vars = {}
         
@@ -354,20 +356,35 @@ class AnsibleGroup(object):
 
                 self.update(group_vars=group_vars)
             elif source.type() == "google_compute_instance":
-                hosts = [source.read_list_attr('network_interface')[0]['access_config'][0]['nat_ip']] # todo support mutil host
-                self.update(hosts=hosts)
+                host_name = "{}.{}".format(source.read_attr("name").replace('-','_'),source.type())
+                # print(host_name)
+                ip = source.read_list_attr('network_interface')[0]['access_config'][0]['nat_ip'] # todo support mutil host
+                tmp = {
+                    host_name:{
+                        'ansible_host':ip
+                    }
+                }
+                # print(tmp)
+                self.update(hosts=tmp)
                 
-        self.hosts = sorted(self.hosts)
+                
+        # self.hosts = sorted(self.hosts)
         self.children = sorted(self.children)
       
 
     def to_dict(self):
         '''Prepare structure for final Ansible inventory JSON.'''
-        return {
-            "children": list(self.children),
-            "hosts": list(self.hosts),
-            "vars": dict(self.group_vars)
-        }
+        if len(self.children) > 0:
+            return {
+                "children": list(self.children),
+                "hosts": self.hosts,
+                "vars": dict(self.group_vars)
+            }
+        else:
+             return {
+                "hosts": self.hosts,
+                "vars": dict(self.group_vars)
+            }
 
 
 def _execute_shell():
@@ -401,7 +418,8 @@ def _main():
             # print(_)
             # if resource.is_ansible():
             inventory.add_resource(resource)
-        sys.stdout.write(json.dumps(inventory.to_dict(), indent=2))
+        # sys.stdout.write(json.dumps(inventory.to_dict(), indent=2))
+        sys.stdout.write(yaml.dump(inventory.to_dict()))
     except Exception:
         traceback.print_exc(file=sys.stderr)
         sys.exit(1)

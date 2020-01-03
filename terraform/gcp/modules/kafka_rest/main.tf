@@ -18,7 +18,7 @@ resource "google_compute_instance" "kafka_rest" {
 
 
   network_interface {
-    network = "default"
+    network = var.network
 
     access_config {
       // Ephemeral IP

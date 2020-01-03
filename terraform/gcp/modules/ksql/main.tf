@@ -18,7 +18,7 @@ labels = {
 
 
   network_interface {
-    network = "default"
+    network =var.network
 
     access_config {
       // Ephemeral IP

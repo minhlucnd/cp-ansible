@@ -9,3 +9,7 @@ variable "zone" {
     default = "asia-southeast1-a"
 }
               
+variable "network" {
+  description = "network"
+  default = "default"
+}
