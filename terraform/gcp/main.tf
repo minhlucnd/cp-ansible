@@ -23,7 +23,7 @@ module "kafka_broker" {
   zone    = var.zone
   project = var.project
   network = module.firewall_confluent.network_name
-
+  node_count = var.broker_node_count
 }
 
 module "kafka_connect" {
@@ -31,7 +31,7 @@ module "kafka_connect" {
   zone    = var.zone
   project = var.project
   network = module.firewall_confluent.network_name
-
+  node_count = var.connect_node_count
 }
 
 module "kafka_rest" {
@@ -39,7 +39,6 @@ module "kafka_rest" {
   zone    = var.zone
   project = var.project
   network = module.firewall_confluent.network_name
-
 }
 
 module "ksql" {
@@ -63,5 +62,6 @@ module "zookeeper" {
   zone    = var.zone
   project = var.project
   network = module.firewall_confluent.network_name
+  node_count = var.broker_node_count
 
 }

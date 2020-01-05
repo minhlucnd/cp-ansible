@@ -1,15 +1,16 @@
 
 resource "google_compute_instance" "kafka_connect" {
-  name         = "kafka-connect"
-  machine_type = "n1-standard-2"
-  project = var.project
-  zone = var.zone
- 
+  name         = "kafka-connect-${count.index}"
+  machine_type = "n1-standard-1"
+  project      = var.project
+  zone         = var.zone
+  count        = var.node_count
+
   tags = ["confluent"]
   labels = {
-      "stack":"confluent",
-      "ansible_group":"kafka_connect"
-    }
+    "stack" : "confluent",
+    "ansible_group" : "kafka_connect"
+  }
 
   boot_disk {
     initialize_params {

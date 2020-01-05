@@ -1,7 +1,7 @@
 
 resource "google_compute_instance" "kafka_rest" {
   name         = "kafka-rest"
-  machine_type = "n1-standard-2"
+  machine_type = "n1-standard-1"
   project = var.project
   zone = var.zone
  

@@ -1,7 +1,7 @@
 
 resource "google_compute_instance" "schema_registry" {
   name         = "schema-registry"
-  machine_type = "n1-standard-2"
+  machine_type = "f1-micro"
   project = var.project
   zone = var.zone
  

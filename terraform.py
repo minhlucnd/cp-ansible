@@ -419,6 +419,12 @@ def _main():
             # if resource.is_ansible():
             inventory.add_resource(resource)
         # sys.stdout.write(json.dumps(inventory.to_dict(), indent=2))
+        inventory.update_groups(groupname="all",group_vars={
+            "ansible_connection":"ssh",
+            "ansible_user":"lucndm",
+            "ansible_become":"true",
+            "ansible_ssh_private_key_file":"~/.ssh/id_rsa"
+        })
         sys.stdout.write(yaml.dump(inventory.to_dict()))
     except Exception:
         traceback.print_exc(file=sys.stderr)

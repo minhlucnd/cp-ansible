@@ -14,6 +14,16 @@ variable "project" {
 }
 
 variable "zone" {
-    description = "Zone"
-    default = "asia-southeast1-a"
+  description = "Zone"
+  default     = "asia-southeast1-a"
 }
+variable "broker_node_count" {
+  description = "broker node count"
+  default     = 3
+}
+
+variable "connect_node_count" {
+  description = "connect node count"
+  default     = 3
+}
+
